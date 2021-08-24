@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="filter" width="256" height="256"></canvas>
+    <canvas id="canvas" width="256" height="256"></canvas>
+    <form style="margin: 20px 0 0 42px">
+        上传本地图片:<input type="file" id="File" name="file"/><br/>
+    </form>
+
+    <script>
+        var processData = function(originalData,type){
+            var data = originalData.data;
+            let offset = 0
+            if(type === 'R') {
+                offset = 0
+                console.log('offset is 0')
+            } else if(type === 'G') {
+                offset = -1
+            } else if(type === 'B') {
+                offset = -2
+            }
+            for(var i = 0; i < data.length; i++){
+                if((i+offset) % 4 == 0){
+                    if(data[i] % 2 == 0){
+                        data[i] = 0;
+                    } else {
+                        data[i] = 100;
+                    }
+                } else if(i % 4 == 3){
+                    // alpha通道不做处理
+                    continue;
+                } else {
+                    // data[i] = 100;
+                }
+            }
+            // 将结果绘制到画布
+            canva.putImageData(originalData, 0, 0);
+        }
+        let canvas = document.getElementById('canvas');  
+        let filter = document.getElementById('filter');
+		let filter_cxt = filter.getContext("2d");  
+        let canva = canvas.getContext("2d");
+        window.onload = function(){
+			document.querySelector("#File").onchange=function(){
+				var Reader=new FileReader();
+				Reader.readAsDataURL(this.files[0]);
+				Reader.onload=function(){
+					let img = new Image();
+					img.src = Reader.result;
+					img.onload = function(){
+						canva.drawImage(img,0,0,canvas.width,canvas.height);
+						let imageData = canva.getImageData(0,0,canvas.width,canvas.height);
+                        console.log(imageData)
+                        var temp= new ImageData(imageData.width, imageData.height);
+                            temp.data.set(imageData.data);
+                        processData(temp, 'G')
+						filter_cxt.putImageData(imageData,0,0);
+					}
+				}
+			}
+		}
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+https://liyucang-git.github.io/2019/07/21/vuex%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/    李宇仓分析
+
+https://tech.meituan.com/2017/04/27/vuex-code-analysis.html    美团分析
+
+https://juejin.cn/post/6844903676721496071    深度分析
+
+https://www.jianshu.com/p/c9a4d1bb1bbf    简易实现

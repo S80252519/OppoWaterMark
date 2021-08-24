@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas" width="256" height="256"></canvas>
+    <script>
+        var ctx = document.getElementById('canvas').getContext('2d');
+        var mergeData = function(newData, color){
+            var oData = originalData.data;
+            console.log(oData)
+            var bit, offset;  // offset的作用是找到alpha通道值
+        
+            switch(color){
+                case 'R':
+                    bit = 0;
+                    offset = 3;
+                    break;
+                case 'G':
+                    bit = 1;
+                    offset = 2;
+                    break;
+                case 'B':
+                    bit = 2;
+                    offset = 1;
+                    break;
+            }
+        
+            for(var i = 0; i < oData.length; i++){
+                if(i % 4 == bit){
+                    // 只处理目标通道
+                    if(newData[i + offset] === 0 && (oData[i] % 2 === 1)){
+                        // 没有信息的像素，该通道最低位置0，但不要越界
+                        if(oData[i] === 255){
+                            oData[i]--;
+                        } else {
+                            oData[i]++;
+                        }
+                    } else if (newData[i + offset] !== 0 && (oData[i] % 2 === 0)){
+                           // 有信息的像素，该通道最低位置1，可以想想上面的斑点效果是怎么实现的
+                        if(oData[i] === 255){
+                            oData[i]--;
+                        } else {
+                            oData[i]++;
+                        }
+                    }
+                }
+            }
+            ctx.putImageData(originalData, 0, 0);
+        }
+        var textData;
+        ctx.font = '30px Microsoft Yahei';
+        ctx.fillText('暗水印', 60, 130);
+        textData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+        var img = new Image();
+        img.crossOrigin = '';
+        var originalData;
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0,256,256);
+            // 获取指定区域的canvas像素信息
+            originalData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+            console.log(originalData)
+            mergeData(textData, 'G')
+        };
+        img.src = 'https://pic4.zhimg.com/v2-3b4fc7e3a1195a081d0259246c38debc_720w.jpg?source=172ae18b';
+    </script>
+</body>
+</html>
